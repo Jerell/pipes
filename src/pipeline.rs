@@ -16,34 +16,37 @@ pub struct Pipeline(Vec<PipeSeg>);
 
 impl Pipeline {
     pub fn new(pb: &PipeBathymetry) -> Pipeline {
-        let mut pipes: Vec<PipeSeg> = Vec::new();
+        let max_length = Length::new(200.0, LengthUnits::M);
 
-        let mut counter = -1;
-        for (length, elevation) in izip!(pb.lengths(), pb.elevations()) {
-            counter += 1;
+        let pipes2: Vec<PipeSeg> = izip!(pb.lengths(), pb.elevations())
+            .enumerate()
+            .map(|(i, (length, elevation))| {
+                let section_length = Length::new(length, LengthUnits::M);
 
-            let max_length = Length::new(200.0, LengthUnits::M);
-            let section_length = Length::new(length, LengthUnits::M);
+                let mut sub_lengths = (1..)
+                    .map(|i| section_length / i)
+                    .filter(|l_vec| l_vec[0] <= max_length);
 
-            let mut sub_lengths = (1..)
-                .map(|i| section_length / i)
-                .filter(|l_vec| l_vec[0] <= max_length);
+                let short_enough = sub_lengths.next();
 
-            let short_enough = sub_lengths.next();
-            match short_enough {
-                Some(l_vec) => {
-                    for l in l_vec {
-                        pipes.push(PipeSeg::new(
-                            &format!("{}-{}", &pb.name, counter),
-                            Length::new(elevation, LengthUnits::M),
-                            l,
-                        ))
-                    }
+                match short_enough {
+                    Some(l_vec) => l_vec
+                        .iter()
+                        .map(|l| {
+                            PipeSeg::new(
+                                &format!("{}-{}", &pb.name, i),
+                                Length::new(elevation, LengthUnits::M),
+                                Length::new(l.m(), LengthUnits::M),
+                            )
+                        })
+                        .collect::<Vec<_>>(),
+                    None => panic!("cannot make a pipe segment short enough"),
                 }
-                None => panic!("cannot make a pipe segment short enough"),
-            }
-        }
-        Pipeline(pipes)
+            })
+            .flatten()
+            .collect();
+
+        Pipeline(pipes2)
     }
 }
 
