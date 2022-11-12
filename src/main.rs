@@ -1,7 +1,4 @@
-use excel::bathymetry::{self, Bathymetry};
-// use physicalquantities::length::{Length, LengthUnits};
-
-// use crate::pipeline::Pipeline;
+use excel::bathymetry::Bathymetry;
 
 pub mod excel;
 pub mod physicalquantities;
@@ -12,7 +9,7 @@ fn main() {
 
     match result {
         Ok(b) => {
-            let lengths_0 = dbg!(b.sections[0].lengths());
+            let _p = dbg!(Bathymetry::to_pipelines(&b));
         }
         _ => {}
     }

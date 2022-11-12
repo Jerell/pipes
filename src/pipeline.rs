@@ -1,58 +1,60 @@
-use core::fmt;
+use itertools::izip;
 
-use crate::physicalquantities::length::Length;
+use crate::{
+    excel::bathymetry::PipeBathymetry,
+    physicalquantities::length::{Length, LengthUnits},
+};
+
+use self::pipeseg::PipeSeg;
+
+pub mod pipeseg;
 
 #[derive(Debug)]
-pub struct Pipeline {
-    name: String,
-    elevation: Length,
-    length: Length,
-}
-
-impl fmt::Display for Pipeline {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "\
-    - pipeseg:
-        name: {}
-        key: false
-        length: {}
-        elevation: {}
-        ambient: AMBIENT
-        uValue: UVALUE
-        diameters:
-            - DIAMETER",
-            self.name, self.length, self.elevation
-        )
-    }
-}
+pub struct Pipeline(Vec<PipeSeg>);
 
 impl Pipeline {
-    pub fn new(name: &str, elevation: Length, length: Length) -> Pipeline {
-        Pipeline {
-            name: String::from(name),
-            elevation,
-            length,
+    pub fn new(pb: &PipeBathymetry) -> Pipeline {
+        let mut pipes: Vec<PipeSeg> = Vec::new();
+        for (length, elevation) in izip!(pb.lengths(), pb.elevations()) {
+            pipes.push(PipeSeg::new(
+                &pb.name,
+                Length::new(elevation, LengthUnits::M),
+                Length::new(length, LengthUnits::M),
+            ))
         }
+        Pipeline(pipes)
     }
 }
 
-#[cfg(test)]
-mod tests {
+// impl fmt::Display for Pipeline {
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         write!(
+//             f,
+//             "\
+//     - pipeseg:
+//         name: {}
+//         key: false
+//         length: {}
+//         elevation: {}
+//         ambient: AMBIENT
+//         uValue: UVALUE
+//         diameters:
+//             - DIAMETER",
+//             self.name, self.length, self.elevation
+//         )
+//     }
+// }
 
-    // use crate::physicalquantities::length::LengthUnits;
+// impl Pipeline {
+//     pub fn new(name: &str, elevation: Length, length: Length) -> Pipeline {
+//         Pipeline {
+//             name: String::from(name),
+//             elevation,
+//             length,
+//         }
+//     }
 
-    // use super::*;
+//     // pub from_pipe_bathymetry(pb: PipeBathymetry) -> Vec<Pipeline> {
 
-    // #[test]
-    // fn height() {
-    //     let l0 = Length::new(1.0, LengthUnits::M);
-
-    //     let e0 = Length::new(1.0, LengthUnits::M);
-    //     let e1 = Length::new(3.0, LengthUnits::M);
-
-    //     let p0 = Pipeline::new("pipe", l0, l0);
-    //     let p1 = Pipeline::new("pipe", e1, l0);
-    // }
-}
+//     // }
+// }

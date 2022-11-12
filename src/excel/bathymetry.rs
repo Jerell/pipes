@@ -1,12 +1,12 @@
-use std::iter::Map;
-
 use calamine::{open_workbook, Error, RangeDeserializerBuilder, Reader, Xlsx};
+
+use crate::pipeline::Pipeline;
 
 use super::file_path;
 
 #[derive(Debug)]
 pub struct PipeBathymetry {
-    name: String,
+    pub name: String,
     coords: Vec<(f32, f32)>,
 }
 
@@ -28,7 +28,6 @@ impl PipeBathymetry {
 
     pub fn lengths(&self) -> Vec<f32> {
         let mut coords = self.coords.iter();
-        let xy0 = coords.next();
 
         let mut last_x = 0.0;
         let mut x_diffs: Vec<f32> = Vec::new();
@@ -72,8 +71,7 @@ impl Bathymetry {
 
         let mut coords: Vec<(f32, f32)> = Vec::new();
 
-        let mut result: Result<PipeBathymetry, Error> =
-            Ok(PipeBathymetry::new(String::from(sheet_name), Vec::new()));
+        let result: Result<PipeBathymetry, Error>;
 
         for row in iter {
             match Some(row) {
@@ -89,9 +87,7 @@ impl Bathymetry {
                         None => print_xy(),
                     }
                 }
-                None => {
-                    result = Err(From::from("expected at least one record but got none"));
-                }
+                _ => {}
             }
         }
         result = Ok(PipeBathymetry::new(String::from(sheet_name), coords));
@@ -116,5 +112,13 @@ impl Bathymetry {
 
         let result: Result<Bathymetry, Error> = Ok(Bathymetry { sections });
         result
+    }
+
+    pub fn to_pipelines(b: &Bathymetry) -> Vec<Pipeline> {
+        let mut sections: Vec<Pipeline> = Vec::new();
+        for section in b.sections.iter() {
+            sections.push(Pipeline::new(section));
+        }
+        sections
     }
 }
