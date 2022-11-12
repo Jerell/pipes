@@ -18,7 +18,7 @@ impl Pipeline {
     pub fn new(pb: &PipeBathymetry) -> Pipeline {
         let max_length = Length::new(200.0, LengthUnits::M);
 
-        let pipes2: Vec<PipeSeg> = izip!(pb.lengths(), pb.elevations())
+        let pipes: Vec<PipeSeg> = izip!(pb.lengths(), pb.elevations())
             .enumerate()
             .map(|(i, (length, elevation))| {
                 let section_length = Length::new(length, LengthUnits::M);
@@ -46,7 +46,7 @@ impl Pipeline {
             .flatten()
             .collect();
 
-        Pipeline(pipes2)
+        Pipeline(pipes)
     }
 }
 
