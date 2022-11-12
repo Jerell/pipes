@@ -27,9 +27,7 @@ impl Pipeline {
                     .map(|i| section_length / i)
                     .filter(|l_vec| l_vec[0] <= max_length);
 
-                let short_enough = sub_lengths.next();
-
-                match short_enough {
+                match sub_lengths.next() {
                     Some(l_vec) => l_vec
                         .iter()
                         .map(|l| {
