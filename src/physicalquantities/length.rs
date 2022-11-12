@@ -1,14 +1,14 @@
 use core::fmt;
-use std::ops::{Add, Sub};
+use std::ops::{Add, Div, Sub};
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct Length {
     m: f32,
 }
 
 impl fmt::Display for Length {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:.2} m", self.m)
+        write!(f, "{} m", self.m)
     }
 }
 
@@ -18,12 +18,6 @@ pub enum LengthUnits {
     Km,
     Mm,
     Inch,
-}
-
-impl PartialEq for Length {
-    fn eq(&self, other: &Self) -> bool {
-        self.m == other.m
-    }
 }
 
 impl Add<Length> for Length {
@@ -36,6 +30,18 @@ impl Sub<Length> for Length {
     type Output = Length;
     fn sub(self, other: Length) -> Length {
         Length::new(self.m - other.m, LengthUnits::M)
+    }
+}
+
+impl Div<i32> for Length {
+    type Output = Vec<Length>;
+    fn div(self, other: i32) -> Vec<Length> {
+        [..other]
+            .iter()
+            .map(|_| Length {
+                m: self.m() / other as f32,
+            })
+            .collect()
     }
 }
 

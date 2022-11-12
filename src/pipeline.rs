@@ -1,4 +1,4 @@
-use core::fmt;
+use core::{fmt, panic};
 
 use itertools::izip;
 
@@ -21,11 +21,27 @@ impl Pipeline {
         let mut counter = -1;
         for (length, elevation) in izip!(pb.lengths(), pb.elevations()) {
             counter += 1;
-            pipes.push(PipeSeg::new(
-                &format!("{}-{}", &pb.name, counter),
-                Length::new(elevation, LengthUnits::M),
-                Length::new(length, LengthUnits::M),
-            ))
+
+            let max_length = Length::new(200.0, LengthUnits::M);
+            let section_length = Length::new(length, LengthUnits::M);
+
+            let mut sub_lengths = (1..)
+                .map(|i| section_length / i)
+                .filter(|l_vec| l_vec[0] <= max_length);
+
+            let short_enough = sub_lengths.next();
+            match short_enough {
+                Some(l_vec) => {
+                    for l in l_vec {
+                        pipes.push(PipeSeg::new(
+                            &format!("{}-{}", &pb.name, counter),
+                            Length::new(elevation, LengthUnits::M),
+                            l,
+                        ))
+                    }
+                }
+                None => panic!("cannot make a pipe segment short enough"),
+            }
         }
         Pipeline(pipes)
     }
