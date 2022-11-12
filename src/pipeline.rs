@@ -1,6 +1,6 @@
 use core::fmt;
 
-use crate::physicalquantities::length::{Length, LengthUnits};
+use crate::physicalquantities::length::Length;
 
 #[derive(Debug)]
 pub struct Pipeline {
@@ -40,16 +40,18 @@ impl Pipeline {
 #[cfg(test)]
 mod tests {
 
-    use super::*;
+    // use crate::physicalquantities::length::LengthUnits;
 
-    #[test]
-    fn height() {
-        let l0 = Length::new(1.0, LengthUnits::M);
+    // use super::*;
 
-        let e0 = Length::new(1.0, LengthUnits::M);
-        let e1 = Length::new(3.0, LengthUnits::M);
+    // #[test]
+    // fn height() {
+    //     let l0 = Length::new(1.0, LengthUnits::M);
 
-        let p0 = Pipeline::new("pipe", l0, l0);
-        let p1 = Pipeline::new("pipe", e1, l0);
-    }
+    //     let e0 = Length::new(1.0, LengthUnits::M);
+    //     let e1 = Length::new(3.0, LengthUnits::M);
+
+    //     let p0 = Pipeline::new("pipe", l0, l0);
+    //     let p1 = Pipeline::new("pipe", e1, l0);
+    // }
 }
