@@ -8,11 +8,5 @@ pub mod physicalquantities;
 pub mod pipeline;
 
 fn main() {
-    // let l1 = Length::new(1.0, LengthUnits::Km);
-    // let l2 = l1;
-    // let p = Pipeline::new("pipe", l1, l2);
-
-    // println!("{}", p);
-
-    let _result = Bathymetry::read_all();
+    let _result = dbg!(Bathymetry::read_all());
 }
