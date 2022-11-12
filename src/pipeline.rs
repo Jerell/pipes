@@ -13,7 +13,15 @@ impl fmt::Display for Pipeline {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "Pipe( {} | length={} | elevation={})",
+            "  - pipeseg:
+        name: {}
+        key: false
+        length: {}
+        elevation: {}
+        ambient: AMBIENT
+        uValue: UVALUE
+        diameters:
+            - DIAMETER",
             self.name, self.length, self.elevation
         )
     }
