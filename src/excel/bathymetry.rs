@@ -1,11 +1,11 @@
-use std::vec;
+use std::iter::Map;
 
 use calamine::{open_workbook, Error, RangeDeserializerBuilder, Reader, Xlsx};
 
 use super::file_path;
 
 #[derive(Debug)]
-struct PipeBathymetry {
+pub struct PipeBathymetry {
     name: String,
     coords: Vec<(f32, f32)>,
 }
@@ -17,11 +17,46 @@ impl PipeBathymetry {
             coords: coords,
         }
     }
+
+    pub fn elevations(&self) -> Vec<f32> {
+        let mut y: Vec<f32> = Vec::new();
+        for xy in self.coords.iter() {
+            y.push(xy.1);
+        }
+        y
+    }
+
+    pub fn lengths(&self) -> Vec<f32> {
+        let mut coords = self.coords.iter();
+        let xy0 = coords.next();
+
+        let mut last_x = 0.0;
+        let mut x_diffs: Vec<f32> = Vec::new();
+
+        let mut update_last = || {
+            let xy_next = coords.next();
+            match xy_next {
+                Some(xy) => {
+                    println!("{}", xy.0);
+                    x_diffs.push(xy.0 - last_x);
+                    last_x = xy.0;
+                }
+                None => {
+                    println!("end")
+                }
+            }
+        };
+
+        for _ in self.coords.iter() {
+            update_last();
+        }
+        x_diffs
+    }
 }
 
 #[derive(Debug)]
 pub struct Bathymetry {
-    sections: Vec<PipeBathymetry>,
+    pub sections: Vec<PipeBathymetry>,
 }
 
 impl Bathymetry {
