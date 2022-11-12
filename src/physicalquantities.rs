@@ -1,13 +1,10 @@
-use length::{Length, LengthUnits};
-
 pub mod length;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     mod length {
-        use super::*;
+        use crate::physicalquantities::length::{Length, LengthUnits};
 
         #[test]
         fn units() {
