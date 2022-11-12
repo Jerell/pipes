@@ -1,3 +1,5 @@
+use core::fmt;
+
 use itertools::izip;
 
 use crate::{
@@ -15,9 +17,12 @@ pub struct Pipeline(Vec<PipeSeg>);
 impl Pipeline {
     pub fn new(pb: &PipeBathymetry) -> Pipeline {
         let mut pipes: Vec<PipeSeg> = Vec::new();
+
+        let mut counter = -1;
         for (length, elevation) in izip!(pb.lengths(), pb.elevations()) {
+            counter += 1;
             pipes.push(PipeSeg::new(
-                &pb.name,
+                &format!("{}-{}", &pb.name, counter),
                 Length::new(elevation, LengthUnits::M),
                 Length::new(length, LengthUnits::M),
             ))
@@ -26,35 +31,10 @@ impl Pipeline {
     }
 }
 
-// impl fmt::Display for Pipeline {
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         write!(
-//             f,
-//             "\
-//     - pipeseg:
-//         name: {}
-//         key: false
-//         length: {}
-//         elevation: {}
-//         ambient: AMBIENT
-//         uValue: UVALUE
-//         diameters:
-//             - DIAMETER",
-//             self.name, self.length, self.elevation
-//         )
-//     }
-// }
+impl fmt::Display for Pipeline {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let pipe_strings: Vec<String> = self.0.iter().map(|ps| ps.to_string()).collect();
 
-// impl Pipeline {
-//     pub fn new(name: &str, elevation: Length, length: Length) -> Pipeline {
-//         Pipeline {
-//             name: String::from(name),
-//             elevation,
-//             length,
-//         }
-//     }
-
-//     // pub from_pipe_bathymetry(pb: PipeBathymetry) -> Vec<Pipeline> {
-
-//     // }
-// }
+        write!(f, "{}", pipe_strings.join("\n"))
+    }
+}
