@@ -20,10 +20,8 @@ impl Bathymetry {
         for row in iter {
             match Some(row) {
                 Some(values) => {
-                    let (x, y, insulation): (String, f64, Option<String>) = values?;
-
+                    let (x, y, insulation): (String, f32, Option<String>) = values?;
                     let print_xy = || println!("  {x}, {y}");
-
                     match insulation {
                         Some(i) => {
                             println!("{i}");
@@ -31,7 +29,6 @@ impl Bathymetry {
                         }
                         None => print_xy(),
                     }
-
                     result = Ok(());
                 }
                 None => {
