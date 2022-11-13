@@ -52,18 +52,15 @@ impl PipeBathymetry {
             })
             .next();
 
-        if let Some(values) = relevant_row {
-            match values {
-                Ok(v) => Ok(Insulation {
-                    name: v.0,
-                    inside_diameter: Length::new(v.1, LengthUnits::M),
-                    r1: Length::new(v.2, LengthUnits::M),
-                    u_wall: v.3,
-                    ax: v.4,
-                    ho: v.5,
-                }),
-                _ => Err(From::from("no insulation values found")),
-            }
+        if let Some(Ok(v)) = relevant_row {
+            Ok(Insulation {
+                name: v.0,
+                inside_diameter: Length::new(v.1, LengthUnits::M),
+                r1: Length::new(v.2, LengthUnits::M),
+                u_wall: v.3,
+                ax: v.4,
+                ho: v.5,
+            })
         } else {
             Err(From::from("no insulation values found"))
         }
