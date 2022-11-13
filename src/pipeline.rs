@@ -20,8 +20,12 @@ impl Pipeline {
 
         let pipes: Vec<PipeSeg> = izip!(pb.lengths(), pb.elevations())
             .enumerate()
-            .map(|(i, (length, elevation))| {
+            .map(|(i, (length, (start_elevation, end_elevation)))| {
                 let section_length = Length::new(length, LengthUnits::M);
+
+                let start_elevation = Length::new(start_elevation, LengthUnits::M);
+                let end_elevation = Length::new(end_elevation, LengthUnits::M);
+                let section_height = end_elevation - start_elevation;
 
                 let mut sub_lengths = (1..)
                     .map(|i| section_length / i)
@@ -30,10 +34,14 @@ impl Pipeline {
                 match sub_lengths.next() {
                     Some(l_vec) => l_vec
                         .iter()
-                        .map(|l| {
+                        .enumerate()
+                        .map(|(j, l)| {
+                            let step_height = (section_height / l_vec.len().try_into().unwrap())[0];
+                            let elevation = start_elevation + step_height * j.try_into().unwrap();
+
                             PipeSeg::new(
-                                &format!("{}-{}", &pb.name, i),
-                                Length::new(elevation, LengthUnits::M),
+                                &format!("{}-{}-{}", &pb.name, i, j),
+                                elevation,
                                 Length::new(l.m(), LengthUnits::M),
                             )
                         })
@@ -44,6 +52,7 @@ impl Pipeline {
             .flatten()
             .collect();
 
+        println!("{}: {} pipesegs", pb.name, pipes.len());
         Pipeline(pipes)
     }
 }

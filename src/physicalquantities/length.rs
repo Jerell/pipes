@@ -1,5 +1,5 @@
 use core::fmt;
-use std::ops::{Add, Div, Sub};
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct Length {
@@ -42,6 +42,13 @@ impl Div<i32> for Length {
                 m: self.m() / other as f32,
             })
             .collect()
+    }
+}
+
+impl Mul<i32> for Length {
+    type Output = Length;
+    fn mul(self, other: i32) -> Length {
+        Length::new(self.m * other as f32, LengthUnits::M)
     }
 }
 

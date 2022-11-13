@@ -18,6 +18,7 @@ fn main() -> std::io::Result<()> {
                 file.write_all(p.to_string().as_bytes())?;
                 file.write_all(b"\n")?;
             }
+            println!("done");
             Ok(())
         }
         _ => panic!("cannot read bathymetry"),

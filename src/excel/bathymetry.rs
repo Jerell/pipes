@@ -18,10 +18,30 @@ impl PipeBathymetry {
         }
     }
 
-    pub fn elevations(&self) -> Vec<f32> {
-        let mut y: Vec<f32> = Vec::new();
-        for xy in self.coords.iter() {
-            y.push(xy.1);
+    pub fn elevations(&self) -> Vec<(f32, f32)> {
+        let mut y: Vec<(f32, f32)> = Vec::new();
+
+        let mut coords = self.coords.iter();
+
+        let mut last_y = 0.0;
+        if let Some(xy) = coords.next() {
+            last_y = xy.1;
+        }
+
+        let mut update_last = || {
+            let xy_next = coords.next();
+            match xy_next {
+                Some(xy) => {
+                    let start_end_elevation = (last_y, xy.1);
+                    last_y = xy.1;
+                    y.push(start_end_elevation);
+                }
+                None => {}
+            }
+        };
+
+        for _ in self.coords.iter() {
+            update_last();
         }
         y
     }
@@ -36,13 +56,10 @@ impl PipeBathymetry {
             let xy_next = coords.next();
             match xy_next {
                 Some(xy) => {
-                    println!("{}", xy.0);
                     x_diffs.push(xy.0 - last_x);
                     last_x = xy.0;
                 }
-                None => {
-                    println!("end")
-                }
+                None => {}
             }
         };
 
