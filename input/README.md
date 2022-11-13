@@ -4,6 +4,8 @@ include two excel files in this folder
 
 ## pipeline bathymetry.xlsx
 
+one table per sheet, one sheet per section
+
 | x [m] | y [m] | insulation   |
 | ----- | ----- | ------------ |
 | 0     | 3     | section name |
