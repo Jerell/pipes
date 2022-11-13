@@ -36,8 +36,8 @@ impl Pipeline {
                     .map(|i| section_length / i)
                     .filter(|l_vec| l_vec[0] <= max_length);
 
-                match sub_lengths.next() {
-                    Some(l_vec) => l_vec
+                if let Some(l_vec) = sub_lengths.next() {
+                    l_vec
                         .iter()
                         .enumerate()
                         .map(|(j, l)| {
@@ -52,8 +52,9 @@ impl Pipeline {
                                 insulation.u_wall,
                             )
                         })
-                        .collect::<Vec<_>>(),
-                    None => panic!("cannot make a pipe segment short enough"),
+                        .collect::<Vec<_>>()
+                } else {
+                    panic!("cannot make a pipe segment short enough")
                 }
             })
             .flatten()

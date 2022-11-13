@@ -67,53 +67,37 @@ impl PipeBathymetry {
     }
 
     pub fn elevations(&self) -> Vec<(f32, f32)> {
-        let mut y: Vec<(f32, f32)> = Vec::new();
-
         let mut coords = self.coords.iter();
-
-        let mut last_y = 0.0;
-        if let Some(xy) = coords.next() {
-            last_y = xy.1;
-        }
-
-        let mut update_last = || {
-            let xy_next = coords.next();
-            match xy_next {
-                Some(xy) => {
-                    let start_end_elevation = (last_y, xy.1);
-                    last_y = xy.1;
-                    y.push(start_end_elevation);
-                }
-                None => {}
-            }
+        let mut ys: Vec<(f32, f32)> = Vec::new();
+        let mut last_y = if let Some((_, y)) = coords.next() {
+            *y
+        } else {
+            0.0
         };
 
-        for _ in self.coords.iter() {
-            update_last();
+        for (_x, y) in coords {
+            let start_end_elevation = (last_y, *y);
+            last_y = *y;
+            ys.push(start_end_elevation);
         }
-        y
+
+        ys
     }
 
     pub fn lengths(&self) -> Vec<f32> {
         let mut coords = self.coords.iter();
-
-        let mut last_x = 0.0;
+        let mut last_x = if let Some((x, _)) = coords.next() {
+            *x
+        } else {
+            0.0
+        };
         let mut x_diffs: Vec<f32> = Vec::new();
 
-        let mut update_last = || {
-            let xy_next = coords.next();
-            match xy_next {
-                Some(xy) => {
-                    x_diffs.push(xy.0 - last_x);
-                    last_x = xy.0;
-                }
-                None => {}
-            }
-        };
-
-        for _ in self.coords.iter() {
-            update_last();
+        for (x, _y) in coords {
+            x_diffs.push(x - last_x);
+            last_x = *x;
         }
+
         x_diffs
     }
 }
@@ -127,35 +111,24 @@ impl Bathymetry {
     fn read_sheet(sheet_name: &str) -> Result<PipeBathymetry, Error> {
         let mut workbook: Xlsx<_> =
             open_workbook(file_path(String::from("pipeline bathymetry.xlsx")))?;
-
         let range = workbook
             .worksheet_range(sheet_name)
             .ok_or(Error::Msg("Cannot find sheet"))??;
-
-        let iter = RangeDeserializerBuilder::new().from_range(&range)?;
+        let iter: RangeDeserializer<DataType, (f32, f32, Option<String>)> =
+            RangeDeserializerBuilder::new().from_range(&range)?;
 
         let mut coords: Vec<(f32, f32)> = Vec::new();
-
+        let mut insulation = String::new();
         let result: Result<PipeBathymetry, Error>;
 
-        let mut insulation = String::new();
-
         for row in iter {
-            match Some(row) {
-                Some(values) => {
-                    let (x, y, insulation_name): (f32, f32, Option<String>) = values?;
-                    coords.push((x, y));
-                    let print_xy = || println!("  {x}, {y}");
-                    match insulation_name {
-                        Some(i) => {
-                            println!("{i}");
-                            insulation = i;
-                            print_xy()
-                        }
-                        None => print_xy(),
-                    }
+            if let Ok((x, y, insulation_name)) = row {
+                if let Some(i) = insulation_name {
+                    println!("{i}");
+                    insulation = i;
                 }
-                _ => {}
+                coords.push((x, y));
+                println!("  {x}, {y}");
             }
         }
         result = Ok(PipeBathymetry::new(
