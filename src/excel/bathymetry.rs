@@ -1,6 +1,11 @@
-use calamine::{open_workbook, Error, RangeDeserializerBuilder, Reader, Xlsx};
+use calamine::{
+    open_workbook, DataType, Error, RangeDeserializer, RangeDeserializerBuilder, Reader, Xlsx,
+};
 
-use crate::pipeline::Pipeline;
+use crate::{
+    physicalquantities::length::{Length, LengthUnits},
+    pipeline::Pipeline,
+};
 
 use super::file_path;
 
@@ -11,12 +16,56 @@ pub struct PipeBathymetry {
     insulation: String,
 }
 
+pub struct Insulation {
+    pub name: String,
+    pub inside_diameter: Length,
+    pub r1: Length,
+    pub u_wall: f32,
+    pub ax: f32,
+    pub ho: i32,
+}
+
 impl PipeBathymetry {
     fn new(name: String, coords: Vec<(f32, f32)>, insulation: String) -> PipeBathymetry {
         PipeBathymetry {
             name,
             coords,
             insulation,
+        }
+    }
+
+    pub fn read_insulation(&self) -> Result<Insulation, Error> {
+        let mut workbook: Xlsx<_> =
+            open_workbook(file_path(String::from("pipeline insulations.xlsx")))?;
+
+        let range = workbook
+            .worksheet_range("Sheet 1")
+            .ok_or(Error::Msg("Cannot find sheet"))??;
+
+        let iter: RangeDeserializer<DataType, (String, f32, f32, f32, f32, i32)> =
+            RangeDeserializerBuilder::new().from_range(&range)?;
+
+        let relevant_row = iter
+            .filter(|r| match r {
+                Ok(values) => values.0 == self.insulation,
+                Err(_) => false,
+            })
+            .next();
+
+        if let Some(values) = relevant_row {
+            match values {
+                Ok(v) => Ok(Insulation {
+                    name: v.0,
+                    inside_diameter: Length::new(v.1, LengthUnits::M),
+                    r1: Length::new(v.2, LengthUnits::M),
+                    u_wall: v.3,
+                    ax: v.4,
+                    ho: v.5,
+                }),
+                _ => Err(From::from("no insulation values found")),
+            }
+        } else {
+            Err(From::from("no insulation values found"))
         }
     }
 

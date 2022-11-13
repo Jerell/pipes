@@ -18,6 +18,11 @@ impl Pipeline {
     pub fn new(pb: &PipeBathymetry) -> Pipeline {
         let max_length = Length::new(200.0, LengthUnits::M);
 
+        let insulation = match pb.read_insulation() {
+            Ok(ins) => ins,
+            Err(_) => panic!("insulation properties not specified"),
+        };
+
         let pipes: Vec<PipeSeg> = izip!(pb.lengths(), pb.elevations())
             .enumerate()
             .map(|(i, (length, (start_elevation, end_elevation)))| {
@@ -43,6 +48,8 @@ impl Pipeline {
                                 &format!("{}-{}-{}", &pb.name, i, j),
                                 elevation,
                                 Length::new(l.m(), LengthUnits::M),
+                                insulation.inside_diameter,
+                                insulation.u_wall,
                             )
                         })
                         .collect::<Vec<_>>(),
