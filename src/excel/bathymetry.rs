@@ -8,13 +8,15 @@ use super::file_path;
 pub struct PipeBathymetry {
     pub name: String,
     coords: Vec<(f32, f32)>,
+    insulation: String,
 }
 
 impl PipeBathymetry {
-    fn new(name: String, coords: Vec<(f32, f32)>) -> PipeBathymetry {
+    fn new(name: String, coords: Vec<(f32, f32)>, insulation: String) -> PipeBathymetry {
         PipeBathymetry {
-            name: name,
-            coords: coords,
+            name,
+            coords,
+            insulation,
         }
     }
 
@@ -90,15 +92,18 @@ impl Bathymetry {
 
         let result: Result<PipeBathymetry, Error>;
 
+        let mut insulation = String::new();
+
         for row in iter {
             match Some(row) {
                 Some(values) => {
-                    let (x, y, insulation): (f32, f32, Option<String>) = values?;
+                    let (x, y, insulation_name): (f32, f32, Option<String>) = values?;
                     coords.push((x, y));
                     let print_xy = || println!("  {x}, {y}");
-                    match insulation {
+                    match insulation_name {
                         Some(i) => {
                             println!("{i}");
+                            insulation = i;
                             print_xy()
                         }
                         None => print_xy(),
@@ -107,7 +112,11 @@ impl Bathymetry {
                 _ => {}
             }
         }
-        result = Ok(PipeBathymetry::new(String::from(sheet_name), coords));
+        result = Ok(PipeBathymetry::new(
+            String::from(sheet_name),
+            coords,
+            String::from(insulation),
+        ));
         result
     }
 
