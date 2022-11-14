@@ -24,5 +24,3 @@ section name should only appear once, should match other spreadsheet
 | section name 2 | 0.8763              | 0.43815 | 0.1761         | 0.60311 | 4           | 10           |
 
 half of these are unused
-
-should also specify ambient temperature here probably
