@@ -9,6 +9,7 @@ pub struct PipeSeg {
     length: Length,
     diameter: Length,
     u_wall: f32,
+    ambient: f32,
 }
 
 impl fmt::Display for PipeSeg {
@@ -21,11 +22,11 @@ impl fmt::Display for PipeSeg {
       key: false
       length: {}
       elevation: {}
-      ambient: AMBIENT
+      ambient: {}
       uValue: {}
       diameters:
           - {}",
-            self.name, self.length, self.elevation, self.u_wall, self.diameter
+            self.name, self.length, self.elevation, self.ambient, self.u_wall, self.diameter
         )
     }
 }
@@ -37,6 +38,7 @@ impl PipeSeg {
         length: Length,
         diameter: Length,
         u_wall: f32,
+        ambient: f32,
     ) -> PipeSeg {
         PipeSeg {
             name: String::from(name),
@@ -44,6 +46,7 @@ impl PipeSeg {
             length,
             diameter,
             u_wall,
+            ambient,
         }
     }
 }

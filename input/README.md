@@ -18,10 +18,10 @@ section name should only appear once, should match other spreadsheet
 
 ## pipeline insulations.xlsx
 
-| name           | inside diameter [m] | r1 [m]  | Uwall [W/m²°C] | Ax [m2] | ho [W/m²°C] |
-| -------------- | ------------------- | ------- | -------------- | ------- | ----------- |
-| section name   | 0.4572              | 0.2286  | 0.2286         | 0.16417 | 4           |
-| section name 2 | 0.8763              | 0.43815 | 0.1761         | 0.60311 | 4           |
+| name           | inside diameter [m] | r1 [m]  | Uwall [W/m²°C] | Ax [m2] | ho [W/m²°C] | ambient [°C] |
+| -------------- | ------------------- | ------- | -------------- | ------- | ----------- | ------------ |
+| section name   | 0.4572              | 0.2286  | 0.2286         | 0.16417 | 4           | 10           |
+| section name 2 | 0.8763              | 0.43815 | 0.1761         | 0.60311 | 4           | 10           |
 
 half of these are unused
 

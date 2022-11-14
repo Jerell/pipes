@@ -50,6 +50,7 @@ impl Pipeline {
                                 Length::new(l.m(), LengthUnits::M),
                                 insulation.inside_diameter,
                                 insulation.u_wall,
+                                insulation.ambient,
                             )
                         })
                         .collect::<Vec<_>>()

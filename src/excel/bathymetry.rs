@@ -23,6 +23,7 @@ pub struct Insulation {
     pub u_wall: f32,
     pub ax: f32,
     pub ho: i32,
+    pub ambient: f32,
 }
 
 impl PipeBathymetry {
@@ -42,7 +43,7 @@ impl PipeBathymetry {
             .worksheet_range("Sheet 1")
             .ok_or(Error::Msg("Cannot find sheet"))??;
 
-        let iter: RangeDeserializer<DataType, (String, f32, f32, f32, f32, i32)> =
+        let iter: RangeDeserializer<DataType, (String, f32, f32, f32, f32, i32, f32)> =
             RangeDeserializerBuilder::new().from_range(&range)?;
 
         let relevant_row = iter
@@ -60,6 +61,7 @@ impl PipeBathymetry {
                 u_wall: v.3,
                 ax: v.4,
                 ho: v.5,
+                ambient: v.6,
             })
         } else {
             Err(From::from("no insulation values found"))

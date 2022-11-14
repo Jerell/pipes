@@ -8,7 +8,7 @@ pub mod pipeline;
 
 fn main() -> std::io::Result<()> {
     if let Ok(b) = Bathymetry::read_all() {
-        let mut file = File::create("foo.yml")?;
+        let mut file = File::create("pipes.yml")?;
 
         let ps = Bathymetry::to_pipelines(&b);
         for p in ps {
