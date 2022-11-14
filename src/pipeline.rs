@@ -69,7 +69,6 @@ impl Pipeline {
 impl fmt::Display for Pipeline {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let pipe_strings: Vec<String> = self.0.iter().map(|ps| ps.to_string()).collect();
-
         write!(f, "{}", pipe_strings.join("\n"))
     }
 }

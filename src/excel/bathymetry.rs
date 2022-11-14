@@ -38,11 +38,9 @@ impl PipeBathymetry {
     pub fn read_insulation(&self) -> Result<Insulation, Error> {
         let mut workbook: Xlsx<_> =
             open_workbook(file_path(String::from("pipeline insulations.xlsx")))?;
-
         let range = workbook
             .worksheet_range("Sheet 1")
             .ok_or(Error::Msg("Cannot find sheet"))??;
-
         let iter: RangeDeserializer<DataType, (String, f32, f32, f32, f32, i32, f32)> =
             RangeDeserializerBuilder::new().from_range(&range)?;
 
@@ -143,14 +141,11 @@ impl Bathymetry {
 
     pub fn read_all() -> Result<Bathymetry, Error> {
         let workbook: Xlsx<_> = open_workbook(file_path(String::from("pipeline bathymetry.xlsx")))?;
-
         let sheets = workbook.sheet_names().iter();
-
         let mut sections: Vec<PipeBathymetry> = Vec::new();
 
         for sheet in sheets {
             println!("{sheet}");
-
             match Bathymetry::read_sheet(sheet) {
                 Ok(section) => sections.push(section),
                 Err(error) => panic!("{}", error),
